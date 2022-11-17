@@ -1,2 +1,15 @@
 Starting audit...
+[ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/main/Main.java:10:8: Unused import - fileio.ActionsInput. [UnusedImports]
+[ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/main/Main.java:12:8: Unused import - fileio.DecksInput. [UnusedImports]
+[ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/main/Main.java:107:45: '30' is a magic number. [MagicNumber]
+[ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/main/Main.java:108:45: '30' is a magic number. [MagicNumber]
+[ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/players/Player1.java:20: Line is longer than 100 characters (found 133). [LineLength]
+[ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/players/Player1.java:21: Line is longer than 100 characters (found 115). [LineLength]
+[ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/players/Player1.java:22: Line is longer than 100 characters (found 134). [LineLength]
+[ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/players/Player1.java:23: Line is longer than 100 characters (found 112). [LineLength]
+[ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/players/Player2.java:20: Line is longer than 100 characters (found 133). [LineLength]
+[ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/players/Player2.java:21: Line is longer than 100 characters (found 115). [LineLength]
+[ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/players/Player2.java:22: Line is longer than 100 characters (found 132). [LineLength]
+[ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/players/Player2.java:23: Line is longer than 100 characters (found 112). [LineLength]
 Audit done.
+Checkstyle ends with 12 errors.
