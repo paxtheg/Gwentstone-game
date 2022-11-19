@@ -24,6 +24,9 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Random;
 
+import static checker.CheckerConstants.*;
+
+
 /**
  * The entry point to this homework. It runs the checker that tests your implementation.
  */
@@ -104,20 +107,56 @@ public final class Main {
                 player1.getDeck().remove(0);
                 player2.getDeck().remove(0);
 
-                player1.getHero().setHealth(30);
-                player2.getHero().setHealth(30);
+                player1.getHero().setHealth(THIRTY); //sets the hero
+                                    // health to 30 because it is not
+                player2.getHero().setHealth(THIRTY);  // initialized by the A.I.
+
+                int playerManaCount = TWO;
+                //is used to count the mana
+                //that the players get
+
+                ArrayList<ArrayList<CardInput>> table = new ArrayList<>(FOUR);
+                for (int y = 0; y < FOUR; y++) {
+                    table.add(new ArrayList<>(FIVE));
+                }
 
                 int turn = inputData.getGames().get(i).getStartGame().getStartingPlayer();
+                int turnCount = 0; //checks if a round has ended
+
                 for (int j = 0; j < inputData.getGames().get(i).getActions().size(); j++) {
-                    int idx = inputData.getGames().get(i).getActions().
+                    int playerIdx = inputData.getGames().get(i).getActions().
                             get(j).getPlayerIdx();
+                    int handIdx = inputData.getGames().get(i).getActions().
+                            get(j).getHandIdx();
+                    int affectedRow = inputData.getGames().get(i).getActions().
+                            get(j).getAffectedRow();
 
                     switch (inputData.getGames().get(i).getActions().get(j).getCommand()) {
                         case "endPlayerTurn":
-                            if (turn == 1) {
-                                turn = 2;
-                            } else if (turn == 2) {
-                                turn = 1;
+                            turnCount++;
+                            if (turnCount == TWO) {
+                                turnCount = 0;
+
+                                player1.setMana(player1.getMana() + playerManaCount);
+                                player2.setMana(player2.getMana() + playerManaCount);
+
+                                if (playerManaCount < TEN) {
+                                    playerManaCount++;
+                                }
+
+                                if (!player1.getDeck().isEmpty()) {
+                                    player1.getHand().add(player1.getDeck().get(0));
+                                    player1.getDeck().remove(0);
+                                }
+                                if (!player2.getDeck().isEmpty()) {
+                                    player2.getHand().add(player2.getDeck().get(0));
+                                    player2.getDeck().remove(0);
+                                }
+                            }
+                            if (turn == ONE) {
+                                turn = TWO;
+                            } else if (turn == TWO) {
+                                turn = ONE;
                             }
                             break;
                         case "getPlayerTurn":
@@ -126,14 +165,14 @@ public final class Main {
                             break;
                         case "getPlayerDeck":
                             ArrayList<CardInput> currentDeck = new ArrayList<>();
-                            if (idx == 1) {
+                            if (playerIdx == ONE) {
                                 currentDeck = player1.getDeck();
-                            } else if (idx == 2) {
+                            } else if (playerIdx == TWO) {
                                 currentDeck = player2.getDeck();
                             }
                             ObjectNode node = output.addObject();
                             node.put("command", "getPlayerDeck").
-                                    put("playerIdx", idx);
+                                    put("playerIdx", playerIdx);
                             ArrayNode arrayNode = node.putArray("output");
                             for (CardInput cardInput : currentDeck) {
                                 ObjectNode node2 = objectMapper.createObjectNode();
@@ -154,13 +193,13 @@ public final class Main {
                             }
                             break;
                         case "getPlayerHero":
-                            if (idx == 1) {
+                            if (playerIdx == ONE) {
                                 CardInput currentHero = player1.getHero();
 
                                 node = output.addObject();
                                 ObjectNode node2 = objectMapper.createObjectNode();
                                 node.put("command", "getPlayerHero").
-                                        put("playerIdx", idx).set("output", node2);
+                                        put("playerIdx", playerIdx).set("output", node2);
                                 node2.put("mana", currentHero.getMana());
                                 node2.put("health", currentHero.getHealth());
                                 node2.put("description", currentHero.getDescription());
@@ -170,13 +209,13 @@ public final class Main {
                                 }
                                 node2.put("name", currentHero.getName());
 
-                            } else if (idx == 2) {
+                            } else if (playerIdx == TWO) {
                                 CardInput currentHero = player2.getHero();
 
                                 node = output.addObject();
                                 ObjectNode node2 = objectMapper.createObjectNode();
                                 node.put("command", "getPlayerHero").
-                                        put("playerIdx", idx).set("output", node2);
+                                        put("playerIdx", playerIdx).set("output", node2);
                                 node2.put("mana", currentHero.getMana());
                                 node2.put("health", currentHero.getHealth());
                                 node2.put("description", currentHero.getDescription());
@@ -187,6 +226,218 @@ public final class Main {
                                 node2.put("name", currentHero.getName());
                             }
                             break;
+                        case "getCardsInHand":
+                            ArrayList<CardInput> currentHand = new ArrayList<>();
+                            if (playerIdx == ONE) {
+                                currentHand = player1.getHand();
+                            } else if (playerIdx == TWO) {
+                                currentHand = player2.getHand();
+                            }
+                            node = output.addObject();
+                            node.put("command", "getCardsInHand").
+                                    put("playerIdx", playerIdx);
+                            arrayNode = node.putArray("output");
+                            for (CardInput cardInput : currentHand) {
+                                ObjectNode node2 = objectMapper.createObjectNode();
+                                node2.put("mana", cardInput.getMana());
+                                if (!cardInput.getName().equals("Winterfell")
+                                        && !cardInput.getName().equals("Heart Hound")
+                                        && !cardInput.getName().equals("Firestorm")) {
+                                    node2.put("attackDamage", cardInput.getAttackDamage());
+                                    node2.put("health", cardInput.getHealth());
+                                }
+                                node2.put("description", cardInput.getDescription());
+                                ArrayNode colorNode = node2.putArray("colors");
+                                for (String string : cardInput.getColors()) {
+                                    colorNode.add(string);
+                                }
+                                node2.put("name", cardInput.getName());
+                                arrayNode.add(node2);
+                            }
+                            break;
+                        case "placeCard":
+                            if (turn == ONE) {
+                                currentHand = player1.getHand();
+                                if (handIdx >= currentHand.size()) {
+                                    break;
+                                }
+                                if (currentHand.get(handIdx).getName().equals("The Ripper")
+                                        || currentHand.get(handIdx).getName().equals("Miraj")
+                                        || currentHand.get(handIdx).getName().equals("Goliath")
+                                        || currentHand.get(handIdx).getName().equals("Warden")) {
+                                    if (currentHand.get(handIdx).getMana() <= player1.getMana()) {
+                                        if (table.get(TWO).size() < FIVE) {
+                                            player1.setMana(player1.getMana() - currentHand.
+                                                    get(handIdx).getMana());
+                                            table.get(TWO).add(currentHand.get(handIdx));
+                                            currentHand.remove(handIdx);
+                                            break;
+                                        } else {
+                                            output.addObject().put("command", "placeCard").
+                                                    put("handIdx", handIdx).
+                                                    put("error",
+                                                            "Cannot place card on table since "
+                                                                    + "row is full.");
+                                            break;
+                                        }
+                                    } else {
+                                        output.addObject().put("command", "placeCard").
+                                                put("handIdx", handIdx).
+                                                put("error",
+                                                        "Not enough mana to place card on table.");
+                                        break;
+                                    }
+                                }
+                                if (currentHand.get(handIdx).getName().equals("Sentinel")
+                                        || currentHand.get(handIdx).getName().
+                                        equals("Berserker")
+                                        || currentHand.get(handIdx).getName().
+                                        equals("The Cursed One")
+                                        || currentHand.get(handIdx).getName().
+                                        equals("Disciple")) {
+                                    if (currentHand.get(handIdx).getMana() <= player1.getMana()) {
+                                        if (table.get(THREE).size() < FIVE) {
+                                            player1.setMana(player1.getMana() - currentHand.
+                                                    get(handIdx).getMana());
+                                            table.get(THREE).add(currentHand.get(handIdx));
+                                            currentHand.remove(handIdx);
+                                            break;
+                                        } else {
+                                            output.addObject().put("command", "placeCard").
+                                                    put("handIdx", handIdx).
+                                                    put("error",
+                                                            "Cannot place card on table since "
+                                                                    + "row is full.");
+                                            break;
+                                        }
+                                    } else {
+                                        output.addObject().put("command", "placeCard").
+                                                put("handIdx", handIdx).
+                                                put("error",
+                                                        "Not enough mana to place card on table.");
+                                        break;
+                                    }
+
+                                }
+                                if (currentHand.get(handIdx).getName().equals("Winterfell")
+                                        || currentHand.get(handIdx).getName().equals("Heart Hound")
+                                        || currentHand.get(handIdx).getName().equals("Firestorm")) {
+                                    output.addObject().put("command", "placeCard").
+                                            put("handIdx", handIdx).
+                                            put("error",
+                                                    "Cannot place environment card on table.");
+                                    break;
+                                }
+                            } else if (turn == TWO) {
+                                currentHand = player2.getHand();
+                                if (handIdx >= currentHand.size()) {
+                                    break;
+                                }
+                                if (currentHand.get(handIdx).getName().equals("The Ripper")
+                                        || currentHand.get(handIdx).getName().equals("Miraj")
+                                        || currentHand.get(handIdx).getName().equals("Goliath")
+                                        || currentHand.get(handIdx).getName().equals("Warden")) {
+                                    if (currentHand.get(handIdx).getMana() <= player2.getMana()) {
+                                        if (table.get(ONE).size() < FIVE) {
+                                            player2.setMana(player2.getMana() - currentHand.
+                                                    get(handIdx).getMana());
+                                            table.get(ONE).add(currentHand.get(handIdx));
+                                            currentHand.remove(handIdx);
+                                            break;
+                                        } else {
+                                            output.addObject().put("command", "placeCard").
+                                                    put("handIdx", handIdx).
+                                                    put("error",
+                                                            "Cannot place card on table since "
+                                                                    + "row is full.");
+                                            break;
+                                        }
+                                    } else {
+                                        output.addObject().put("command", "placeCard").
+                                                put("handIdx", handIdx).
+                                                put("error",
+                                                        "Not enough mana to place card on table.");
+                                        break;
+                                    }
+                                }
+                                if (currentHand.get(handIdx).getName().equals("Sentinel")
+                                        || currentHand.get(handIdx).getName().equals("Berserker")
+                                        || currentHand.get(handIdx).getName().
+                                        equals("The Cursed One")
+                                        || currentHand.get(handIdx).getName().equals("Disciple")) {
+                                    if (currentHand.get(handIdx).getMana() <= player2.getMana()) {
+                                        if (table.get(0).size() < FIVE) {
+                                            player2.setMana(player2.getMana() - currentHand.
+                                                    get(handIdx).getMana());
+                                            table.get(0).add(currentHand.get(handIdx));
+                                            currentHand.remove(handIdx);
+                                            break;
+                                        } else {
+                                            output.addObject().put("command", "placeCard").
+                                                    put("handIdx", handIdx).
+                                                    put("error",
+                                                            "Cannot place card on table since "
+                                                                    + "row is full.");
+                                            break;
+                                        }
+                                    } else {
+                                        output.addObject().put("command", "placeCard").
+                                                put("handIdx", handIdx).
+                                                put("error",
+                                                        "Not enough mana to place card on table.");
+                                        break;
+                                    }
+                                }
+                                if (currentHand.get(handIdx).getName().equals("Winterfell")
+                                        || currentHand.get(handIdx).getName().equals("Heart Hound")
+                                        || currentHand.get(handIdx).getName().equals("Firestorm")) {
+                                    output.addObject().put("command", "placeCard").
+                                            put("handIdx", handIdx).
+                                            put("error",
+                                                    "Cannot place environment card on table.");
+                                    break;
+                                }
+                            }
+                            System.out.println("A ajuns");
+                            break;
+                        case "getCardsOnTable":
+                            node = output.addObject();
+                            node.put("command", "getCardsOnTable");
+                            arrayNode = node.putArray("output");
+                            for (ArrayList<CardInput> row : table) {
+                                ArrayNode arrayNode1 = objectMapper.createArrayNode();
+                                for (CardInput cardInput : row) {
+                                    ObjectNode node2 = objectMapper.createObjectNode();
+                                    node2.put("mana", cardInput.getMana());
+                                    if (!cardInput.getName().equals("Winterfell")
+                                            && !cardInput.getName().equals("Heart Hound")
+                                            && !cardInput.getName().equals("Firestorm")) {
+                                        node2.put("attackDamage", cardInput.getAttackDamage());
+                                        node2.put("health", cardInput.getHealth());
+                                    }
+                                    node2.put("description", cardInput.getDescription());
+                                    ArrayNode colorNode = node2.putArray("colors");
+                                    for (String string : cardInput.getColors()) {
+                                        colorNode.add(string);
+                                    }
+                                    node2.put("name", cardInput.getName());
+                                    arrayNode1.add(node2);
+                                }
+                                arrayNode.add(arrayNode1);
+                            }
+                            break;
+                        case "getPlayerMana":
+                            if (playerIdx == ONE) {
+                                output.addObject().put("command", "getPlayerMana").
+                                        put("playerIdx", playerIdx).
+                                        put("output", player1.getMana());
+                            } else if (playerIdx == TWO) {
+                                output.addObject().put("command", "getPlayerMana").
+                                        put("playerIdx", playerIdx).
+                                        put("output", player2.getMana());
+                            }
+                            break;
+
                         default:
                             break;
 

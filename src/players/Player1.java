@@ -14,17 +14,27 @@ public final class Player1 {
     private ArrayList<CardInput> hand;
     private CardInput hero;
 
+    private int mana;
+
 
     public Player1(final Input input, final int gameIdx) {
         this.deckArray = input.getPlayerOneDecks(); // saves in Player1 the decks array
-        this.deckIdx = input.getGames().get(gameIdx).getStartGame().getPlayerOneDeckIdx();  // saves in Player1 the index of the deck
-                                                                                        // that is going to be used
-        this.deck = deckArray.getDecks().get(deckIdx);   //saves in Player1 the card array, based by the deck that is going to be used
-        this.hero = input.getGames().get(gameIdx).getStartGame().getPlayerOneHero(); //saves in Player1 the hero
+        this.deckIdx = input.getGames().get(gameIdx).
+                getStartGame().getPlayerOneDeckIdx();  // saves in Player1 the index of the deck
+                                                        // that is going to be used
+        this.deck = deckArray.getDecks().get(deckIdx);   //saves in Player1 the card array,
+                                            // based by the deck that is going to be used
+        this.hero = input.getGames().get(gameIdx).
+                getStartGame().getPlayerOneHero(); //saves in Player1 the hero
 
         this.hand = new ArrayList<>(deck.size());
+        this.mana = 1;
         // ultima carte : cards.get(cards.size() - 1);
     }
+
+  /*  public ArrayList<CardInput> (final ArrayList<CardInput> deckDeepCopy) {
+        this.deck = new ArrayList<CardInput>(deckDeepCopy);
+    }*/
 
     public DecksInput getDeckArray() {
         return deckArray;
@@ -32,6 +42,14 @@ public final class Player1 {
 
     public void setDeckArray(final DecksInput deckArray) {
         this.deckArray = deckArray;
+    }
+
+    public int getMana() {
+        return mana;
+    }
+
+    public void setMana(final int mana) {
+        this.mana = mana;
     }
 
     public ArrayList<CardInput> getDeck() {

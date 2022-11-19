@@ -14,14 +14,20 @@ public final class Player2 {
     private ArrayList<CardInput> hand;
     private CardInput hero;
 
+    private int mana;
+
 
     public Player2(final Input input, final int gameIdx) {
         this.deckArray = input.getPlayerTwoDecks();  // saves in Player2 the decks array
-        this.deckIdx = input.getGames().get(gameIdx).getStartGame().getPlayerTwoDeckIdx();  // saves in Player2 the index of the deck
-                                                                                        // that is going to be used
-        this.deck = deckArray.getDecks().get(deckIdx); //saves in Player2 the card array, based by the deck that is going to be used
-        this.hero = input.getGames().get(gameIdx).getStartGame().getPlayerTwoHero(); //saves in Player2 the hero
+        this.deckIdx = input.getGames().get(gameIdx).
+                getStartGame().getPlayerTwoDeckIdx();  // saves in Player2 the index of the deck
+                                                    // that is going to be used
+        this.deck = deckArray.getDecks().get(deckIdx); //saves in Player2 the card array,
+                                                    // based by the deck that is going to be used
+        this.hero = input.getGames().get(gameIdx).
+                getStartGame().getPlayerTwoHero(); //saves in Player2 the hero
         this.hand = new ArrayList<>(deck.size());
+        this.mana = 1;
     }
 
     public DecksInput getDeckArray() {
@@ -30,6 +36,14 @@ public final class Player2 {
 
     public void setDeckArray(final DecksInput deckArray) {
         this.deckArray = deckArray;
+    }
+
+    public int getMana() {
+        return mana;
+    }
+
+    public void setMana(final int mana) {
+        this.mana = mana;
     }
 
     public ArrayList<CardInput> getDeck() {

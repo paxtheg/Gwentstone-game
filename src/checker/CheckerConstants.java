@@ -12,6 +12,22 @@ public final class CheckerConstants {
     // checker constants
     public static final Integer BIG_TEST_POINTS = 3;
     public static final Integer MAXIMUM_ERROR_CHECKSTYLE = 30;
+
+    public static final Integer ONE = 1;
+
+    public static final Integer TWO = 2;
+
+    public static final Integer THREE = 3;
+
+    public static final Integer FOUR = 4;
+
+    public static final Integer FIVE = 5;
+
+    public static final Integer TEN = 10;
+
+    public static final Integer THIRTY = 30;
+
+
     public static final Integer CHECKSTYLE_POINTS = 10;
     public static final String TESTS_PATH = "input/";
     public static final String OUT_PATH = "result/out_";
