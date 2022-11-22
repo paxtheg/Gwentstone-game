@@ -17,6 +17,8 @@ public final class Player1 {
     private int mana;
 
 
+
+
     public Player1(final Input input, final int gameIdx) {
         this.deckArray = input.getPlayerOneDecks(); // saves in Player1 the decks array
         this.deckIdx = input.getGames().get(gameIdx).

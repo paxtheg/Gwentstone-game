@@ -10,6 +10,11 @@ public final class CardInput {
     private ArrayList<String> colors;
     private String name;
 
+    private int isFrozen;
+
+    private int hasAttacked;
+
+
     public CardInput() {
     }
 
@@ -59,6 +64,22 @@ public final class CardInput {
 
     public void setName(final String name) {
         this.name = name;
+    }
+
+    public int getIsFrozen() {
+        return isFrozen;
+    }
+
+    public void setIsFrozen(final int isFrozen) {
+        this.isFrozen = isFrozen;
+    }
+
+    public int getHasAttacked() {
+        return hasAttacked;
+    }
+
+    public void setHasAttacked(final int hasAttacked) {
+        this.hasAttacked = hasAttacked;
     }
 
     @Override

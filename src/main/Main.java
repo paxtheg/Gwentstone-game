@@ -27,21 +27,16 @@ import java.util.Random;
 import static checker.CheckerConstants.*;
 
 
-/**
- * The entry point to this homework. It runs the checker that tests your implementation.
- */
 public final class Main {
     /**
      * for coding style
      */
-    //final private int i = 2;
     private Main() {
     }
 
     /**
      * DO NOT MODIFY MAIN METHOD
      * Call the checker
-     *
      * @param args from command line
      * @throws IOException in case of exceptions to reading / writing
      */
@@ -82,6 +77,7 @@ public final class Main {
                 Input.class);
 
         ArrayNode output = objectMapper.createArrayNode();
+
 
         //TODO add here the entry point to your implementation
 
@@ -130,6 +126,18 @@ public final class Main {
                             get(j).getHandIdx();
                     int affectedRow = inputData.getGames().get(i).getActions().
                             get(j).getAffectedRow();
+                    int X = inputData.getGames().get(i).getActions().
+                            get(j).getX();
+                    int Y = inputData.getGames().get(i).getActions().
+                            get(j).getY();
+                    /*int cardAttackerX = inputData.getGames().get(i).getActions().
+                            get(j).getCardAttacker().getX();
+                    int cardAttackerY = inputData.getGames().get(i).getActions().
+                            get(j).getCardAttacker().getY();
+                    int cardAttackedX = inputData.getGames().get(i).getActions().
+                            get(j).getCardAttacked().getX();
+                    int cardAttackedY = inputData.getGames().get(i).getActions().
+                            get(j).getCardAttacked().getY();*/
 
                     switch (inputData.getGames().get(i).getActions().get(j).getCommand()) {
                         case "endPlayerTurn":
@@ -155,8 +163,21 @@ public final class Main {
                             }
                             if (turn == ONE) {
                                 turn = TWO;
+                                for (int y = 0; y < table.get(TWO).size(); y++) {
+                                    table.get(TWO).get(y).setIsFrozen(0);
+                                }
+                                for (int y = 0; y < table.get(THREE).size(); y++) {
+                                    table.get(THREE).get(y).setIsFrozen(0);
+                                }
+
                             } else if (turn == TWO) {
                                 turn = ONE;
+                                for (int y = 0; y < table.get(0).size(); y++) {
+                                    table.get(0).get(y).setIsFrozen(0);
+                                }
+                                for (int y = 0; y < table.get(ONE).size(); y++) {
+                                    table.get(ONE).get(y).setIsFrozen(0);
+                                }
                             }
                             break;
                         case "getPlayerTurn":
@@ -398,8 +419,502 @@ public final class Main {
                                     break;
                                 }
                             }
-                            System.out.println("A ajuns");
                             break;
+                        case "getEnvironmentCardsInHand":
+                            currentHand = new ArrayList<>();
+                            if (playerIdx == ONE) {
+                                currentHand = player1.getHand();
+                            } else if (playerIdx == TWO) {
+                                currentHand = player2.getHand();
+                            }
+                            node = output.addObject();
+                            node.put("command", "getEnvironmentCardsInHand").
+                                    put("playerIdx", playerIdx);
+                            arrayNode = node.putArray("output");
+                            for (CardInput cardInput : currentHand) {
+                                if (cardInput.getName().equals("Winterfell")
+                                        || cardInput.getName().equals("Heart Hound")
+                                        || cardInput.getName().equals("Firestorm")) {
+                                    ObjectNode node2 = objectMapper.createObjectNode();
+                                    node2.put("mana", cardInput.getMana());
+                                    node2.put("description", cardInput.getDescription());
+                                    ArrayNode colorNode = node2.putArray("colors");
+                                    for (String string : cardInput.getColors()) {
+                                        colorNode.add(string);
+                                    }
+                                    node2.put("name", cardInput.getName());
+                                    arrayNode.add(node2);
+                                }
+                            }
+                            break;
+                        case "useEnvironmentCard":
+                            if (turn == ONE) {
+                                currentHand = player1.getHand();
+                                if (handIdx >= currentHand.size()) {
+                                    break;
+                                }
+                                if (currentHand.get(handIdx).getName().equals("Winterfell")
+                                        || currentHand.get(handIdx).getName().equals("Heart Hound")
+                                        || currentHand.get(handIdx).getName().equals("Firestorm")) {
+                                    if (currentHand.get(handIdx).getMana() <= player1.getMana()) {
+                                        if (affectedRow == 0 || affectedRow == ONE) {
+                                            if (currentHand.get(handIdx).getName().
+                                                    equals("Firestorm")) {
+                                                player1.setMana(player1.getMana() - currentHand.
+                                                        get(handIdx).getMana());
+                                                for (int y = 0; y < table.get(affectedRow).
+                                                        size(); y++) {
+                                                    if (table.get(affectedRow).get(y).
+                                                            getHealth() - 1 > 0) {
+                                                        table.get(affectedRow).get(y).
+                                                                setHealth(table.get(affectedRow).
+                                                                        get(y).getHealth() - 1);
+                                                        } else {
+                                                        table.get(affectedRow).
+                                                                remove(table.get(affectedRow).
+                                                                        get(y));
+                                                        y--;
+                                                        }
+                                                }
+                                                currentHand.remove(handIdx);
+                                                break;
+                                            }
+                                            if (currentHand.get(handIdx).getName().
+                                                    equals("Winterfell")) {
+                                                player1.setMana(player1.getMana() - currentHand.
+                                                        get(handIdx).getMana());
+                                                for (int y = 0; y < table.get(affectedRow).
+                                                        size(); y++) {
+                                                    table.get(affectedRow).get(y).setIsFrozen(1);
+                                                }
+                                                currentHand.remove(handIdx);
+                                                break;
+                                            }
+                                            if (currentHand.get(handIdx).getName().
+                                                    equals("Heart Hound")) {
+
+                                                if (affectedRow == ONE
+                                                        && table.get(TWO).size() < FIVE) {
+                                                    player1.setMana(player1.getMana() - currentHand.
+                                                            get(handIdx).getMana());
+
+                                                    CardInput cardWithBiggestHealth;
+                                                    cardWithBiggestHealth = new CardInput();
+                                                    cardWithBiggestHealth.setHealth(0);
+
+                                                    for (int y = 0; y < table.get(affectedRow).
+                                                            size(); y++) {
+                                                        if (table.get(affectedRow).get(y).
+                                                                getHealth() > cardWithBiggestHealth.
+                                                                getHealth()) {
+                                                            cardWithBiggestHealth = table.
+                                                                    get(affectedRow).get(y);
+                                                        }
+                                                    }
+
+
+                                                    for (int y = 0; y < table.get(affectedRow).
+                                                            size(); y++) {
+                                                        if (cardWithBiggestHealth == table.
+                                                                get(ONE).get(y)) {
+                                                            table.get(TWO).
+                                                                    add(table.get(ONE).
+                                                                            get(y));
+                                                            table.get(ONE).
+                                                                    remove(table.get(ONE).
+                                                                            get(y));
+                                                            currentHand.remove(handIdx);
+                                                            break;
+                                                        }
+                                                    }
+                                                    break;
+                                                }
+                                                if (affectedRow == 0
+                                                        && table.get(THREE).size() < FIVE) {
+                                                    player1.setMana(player1.getMana() - currentHand.
+                                                            get(handIdx).getMana());
+
+                                                    CardInput cardWithBiggestHealth;
+                                                    cardWithBiggestHealth = new CardInput();
+                                                    cardWithBiggestHealth.setHealth(0);
+
+                                                    for (int y = 0; y < table.get(affectedRow).
+                                                            size(); y++) {
+                                                        if (table.get(affectedRow).get(y).
+                                                                getHealth() > cardWithBiggestHealth.
+                                                                getHealth()) {
+                                                            cardWithBiggestHealth = table.
+                                                                    get(affectedRow).get(y);
+                                                        }
+                                                    }
+
+
+                                                    for (int y = 0; y < table.get(affectedRow).
+                                                            size(); y++) {
+                                                        if (cardWithBiggestHealth == table.
+                                                                get(0).get(y)) {
+                                                            table.get(THREE).
+                                                                    add(table.get(0).
+                                                                            get(y));
+                                                            table.get(0).
+                                                                    remove(table.get(0).
+                                                                            get(y));
+                                                            currentHand.remove(handIdx);
+                                                            break;
+                                                        }
+                                                    }
+                                                    break;
+                                                } else {
+                                                    output.addObject().
+                                                            put("command", "useEnvironmentCard").
+                                                            put("handIdx", handIdx).
+                                                            put("affectedRow", affectedRow).
+                                                            put("error",
+                                                                    "Cannot steal enemy card since"
+                                                                            + " the player's row "
+                                                                            + "is full.");
+                                                    break;
+                                                }
+                                            }
+                                        } else {
+                                            output.addObject().
+                                                    put("command", "useEnvironmentCard").
+                                                    put("handIdx", handIdx).
+                                                    put("affectedRow", affectedRow).
+                                                    put("error",
+                                                            "Chosen row does"
+                                                                    + " not belong to the enemy.");
+                                            break;
+                                        }
+                                    } else {
+                                        output.addObject().
+                                                put("command", "useEnvironmentCard").
+                                                put("handIdx", handIdx).
+                                                put("affectedRow", affectedRow).
+                                                put("error",
+                                                        "Not enough mana to use environment card.");
+                                        break;
+                                    }
+
+                                } else {
+                                    output.addObject().put("command", "useEnvironmentCard").
+                                            put("handIdx", handIdx).
+                                            put("affectedRow", affectedRow).
+                                            put("error",
+                                                    "Chosen card is not of type environment.");
+                                    break;
+                                }
+
+                            } else if (turn == TWO) {
+                                currentHand = player2.getHand();
+                                if (handIdx >= currentHand.size()) {
+                                    break;
+                                }
+                                if (currentHand.get(handIdx).getName().equals("Winterfell")
+                                        || currentHand.get(handIdx).getName().equals("Heart Hound")
+                                        || currentHand.get(handIdx).getName().equals("Firestorm")) {
+                                    if (currentHand.get(handIdx).getMana() <= player2.getMana()) {
+                                        if (affectedRow == TWO || affectedRow == THREE) {
+                                            if (currentHand.get(handIdx).getName().
+                                                    equals("Firestorm")) {
+                                                player2.setMana(player2.getMana() - currentHand.
+                                                        get(handIdx).getMana());
+                                                for (int y = 0; y < table.get(affectedRow).
+                                                        size(); y++) {
+                                                    if (table.get(affectedRow).get(y).
+                                                            getHealth() - 1 > 0) {
+                                                        table.get(affectedRow).get(y).
+                                                                setHealth(table.
+                                                                get(affectedRow).get(y).
+                                                                        getHealth() - 1);
+                                                    } else {
+                                                        table.get(affectedRow).
+                                                                remove(table.get(affectedRow).
+                                                                        get(y));
+                                                        y--;
+                                                    }
+                                                }
+                                                currentHand.remove(handIdx);
+                                                break;
+                                            }
+                                            if (currentHand.get(handIdx).getName().
+                                                    equals("Winterfell")) {
+                                                player2.setMana(player2.getMana() - currentHand.
+                                                        get(handIdx).getMana());
+                                                for (int y = 0; y < table.get(affectedRow).
+                                                        size(); y++) {
+                                                    table.get(affectedRow).get(y).setIsFrozen(1);
+                                                }
+                                                currentHand.remove(handIdx);
+                                                break;
+                                            }
+                                            if (currentHand.get(handIdx).getName().
+                                                    equals("Heart Hound")) {
+                                                if (affectedRow == THREE
+                                                        && table.get(0).size() < FIVE) {
+                                                    player2.setMana(player2.getMana() - currentHand.
+                                                            get(handIdx).getMana());
+
+                                                    CardInput cardWithBiggestHealth;
+                                                    cardWithBiggestHealth = new CardInput();
+                                                    cardWithBiggestHealth.setHealth(0);
+
+                                                    for (int y = 0; y < table.get(affectedRow).
+                                                            size(); y++) {
+                                                        if (table.get(affectedRow).get(y).
+                                                                getHealth() > cardWithBiggestHealth.
+                                                                getHealth()) {
+                                                            cardWithBiggestHealth = table.
+                                                                    get(affectedRow).get(y);
+                                                        }
+                                                    }
+
+                                                    for (int y = 0; y < table.get(affectedRow).
+                                                            size(); y++) {
+                                                        if (cardWithBiggestHealth == table.
+                                                                get(THREE).get(y)) {
+                                                            table.get(0).add(table.
+                                                                    get(THREE).get(y));
+                                                            table.get(THREE).remove(table.
+                                                                    get(THREE).get(y));
+                                                            currentHand.remove(handIdx);
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                if (affectedRow == TWO
+                                                        && table.get(ONE).size() < FIVE) {
+                                                    player2.setMana(player2.getMana() - currentHand.
+                                                            get(handIdx).getMana());
+
+                                                    CardInput cardWithBiggestHealth;
+                                                    cardWithBiggestHealth = new CardInput();
+                                                    cardWithBiggestHealth.setHealth(0);
+
+                                                    for (int y = 0; y < table.get(affectedRow).
+                                                            size(); y++) {
+                                                        if (table.get(affectedRow).get(y).
+                                                                getHealth() > cardWithBiggestHealth.
+                                                                getHealth()) {
+                                                            cardWithBiggestHealth = table.
+                                                                    get(affectedRow).get(y);
+                                                        }
+                                                    }
+
+                                                    for (int y = 0; y < table.get(affectedRow).
+                                                            size(); y++) {
+                                                        if (cardWithBiggestHealth == table.
+                                                                get(TWO).get(y)) {
+                                                            table.get(ONE).add(table.
+                                                                    get(TWO).get(y));
+                                                            table.get(TWO).remove(table.
+                                                                    get(TWO).get(y));
+                                                            currentHand.remove(handIdx);
+                                                            break;
+                                                        }
+                                                    }
+                                                } else {
+                                                    output.addObject().
+                                                            put("command", "useEnvironmentCard").
+                                                            put("handIdx", handIdx).
+                                                            put("affectedRow", affectedRow).
+                                                            put("error",
+                                                                    "Cannot steal enemy card since"
+                                                                            + " the player's row"
+                                                                            + " is full.");
+                                                    break;
+                                                }
+                                            }
+                                        } else {
+                                            output.addObject().put("command", "useEnvironmentCard").
+                                                    put("handIdx", handIdx).
+                                                    put("affectedRow", affectedRow).
+                                                    put("error",
+                                                            "Chosen row does not "
+                                                                    + "belong to the enemy.");
+                                            break;
+                                        }
+                                    } else {
+                                        output.addObject().put("command", "useEnvironmentCard").
+                                                put("handIdx", handIdx).
+                                                put("affectedRow", affectedRow).
+                                                put("error",
+                                                        "Not enough mana to use environment card.");
+                                        break;
+                                    }
+
+                                } else {
+                                    output.addObject().put("command", "useEnvironmentCard").
+                                            put("handIdx", handIdx).
+                                            put("affectedRow", affectedRow).
+                                            put("error",
+                                                    "Chosen card is not of type environment.");
+                                    break;
+                                }
+                            }
+                            break;
+                        /*case "cardUsesAttack":
+                            CardInput cardAttacker = new CardInput();
+                            CardInput cardAttacked = new CardInput();
+                            cardAttacker = table.get(cardAttackerX).get(cardAttackerY);
+                            cardAttacked = table.get(cardAttackedX).get(cardAttackedY);
+                            if (turn == ONE) {
+                                if (cardAttackedX == 0 || cardAttackerX == ONE) {
+                                    if (cardAttacker.getHasAttacked() == 0) {
+                                        if (cardAttacker.getIsFrozen() == 0) {
+                                            for (int y = 0; y < table.get(ONE).size(); y++) {
+                                                if (table.get(ONE).get(y).getName().
+                                                        equals("Goliath")
+                                                        || table.get(ONE).get(y).getName().
+                                                        equals("Warden") ) {
+                                                    if (cardAttackedY != y
+                                                            || cardAttackedX != ONE) {
+                                                        //error "Attacked card is not of type 'Tank’."
+                                                        break;
+                                                    } else {
+                                                        player1.setMana(player1.
+                                                                getMana() - cardAttacker.
+                                                                getMana());
+                                                        if (cardAttacked.getHealth() - cardAttacker.
+                                                                getAttackDamage() > 0) {
+                                                            cardAttacked.setHealth(cardAttacked.
+                                                                    getHealth() - cardAttacker.
+                                                                    getAttackDamage());
+                                                        } else {
+                                                            table.get(cardAttackedX).
+                                                                    remove(cardAttacked);
+                                                        }
+                                                        cardAttacker.setHasAttacked(1);
+                                                        break;
+                                                    }
+                                                } else {
+                                                    player1.setMana(player1.
+                                                            getMana() - cardAttacker.
+                                                            getMana());
+                                                    if (cardAttacked.getHealth() - cardAttacker.
+                                                            getAttackDamage() > 0) {
+                                                        cardAttacked.setHealth(cardAttacked.
+                                                                getHealth() - cardAttacker.
+                                                                getAttackDamage());
+                                                    } else {
+                                                        table.get(cardAttackedX).
+                                                                remove(cardAttacked);
+                                                    }
+                                                    cardAttacker.setHasAttacked(1);
+                                                    break;
+                                                }
+                                            }
+                                        } else {
+                                            //error "Attacker card is frozen."
+                                            break;
+                                        }
+                                    } else {
+                                        // error "Attacker card has already attacked this turn."
+                                        break;
+                                    }
+                                } else {
+                                    //error "Attacked card does not belong to the enemy."
+                                    break;
+                                }
+
+                            } else if (turn == TWO) {
+                                if (cardAttackedX == TWO || cardAttackerX == THREE) {
+                                    if (cardAttacker.getHasAttacked() == 0) {
+                                        if (cardAttacker.getIsFrozen() == 0) {
+                                            for (int y = 0; y < table.get(TWO).size(); y++) {
+                                                if (table.get(TWO).get(y).getName().
+                                                        equals("Goliath")
+                                                        || table.get(TWO).get(y).getName().
+                                                        equals("Warden") ) {
+                                                    if (cardAttackedY != y
+                                                            || cardAttackedX != TWO) {
+                                                        //error "Attacked card is not of type 'Tank’."
+                                                        break;
+                                                    } else {
+                                                        player2.setMana(player2.
+                                                                getMana() - cardAttacker.
+                                                                getMana());
+                                                        if (cardAttacked.getHealth() - cardAttacker.
+                                                                getAttackDamage() > 0) {
+                                                            cardAttacked.setHealth(cardAttacked.
+                                                                    getHealth() - cardAttacker.
+                                                                    getAttackDamage());
+                                                        } else {
+                                                            table.get(cardAttackedX).
+                                                                    remove(cardAttacked);
+                                                        }
+                                                        cardAttacker.setHasAttacked(1);
+                                                        break;
+                                                    }
+                                                } else {
+                                                    player2.setMana(player2.
+                                                            getMana() - cardAttacker.
+                                                            getMana());
+                                                    if (cardAttacked.getHealth() - cardAttacker.
+                                                            getAttackDamage() > 0) {
+                                                        cardAttacked.setHealth(cardAttacked.
+                                                                getHealth() - cardAttacker.
+                                                                getAttackDamage());
+                                                    } else {
+                                                        table.get(cardAttackedX).
+                                                                remove(cardAttacked);
+                                                    }
+                                                    cardAttacker.setHasAttacked(1);
+                                                    break;
+                                                }
+                                            }
+                                        } else {
+                                            //error "Attacker card is frozen."
+                                            break;
+                                        }
+                                    } else {
+                                        // error "Attacker card has already attacked this turn."
+                                        break;
+                                    }
+                                } else {
+                                    //error "Attacked card does not belong to the enemy."
+                                    break;
+                                }
+                            }
+                            break;*/
+                        case "getCardAtPosition":
+                            if (table.size() > X) {
+                                if (table.get(X).size() > Y) {
+                                    node = output.addObject();
+                                    ObjectNode node2 = objectMapper.createObjectNode();
+                                    node.put("command", "getCardAtPosition").
+                                            put("x", X).
+                                            put("y", Y).
+                                            set("output", node2);
+                                    node2.put("mana", table.get(X).get(Y).getMana());
+                                    node2.put("attackDamage", table.get(X).
+                                            get(Y).getAttackDamage());
+                                    node2.put("health", table.get(X).get(Y).getHealth());
+                                    node2.put("description", table.get(X).get(Y).getDescription());
+                                    ArrayNode colorNode = node2.putArray("colors");
+                                    for (String string : table.get(X).get(Y).getColors()) {
+                                        colorNode.add(string);
+                                    }
+                                    node2.put("name", table.get(X).get(Y).getName());
+                                    break;
+                                } else {
+                                    output.addObject().put("command", "getCardAtPosition").
+                                            put("handIdx", handIdx).
+                                            put("x", X).
+                                            put("y", Y).
+                                            put("error",
+                                                    "No card available at that position.");
+                                    break;
+                                }
+                            } else {
+                                output.addObject().put("command", "getCardAtPosition").
+                                        put("handIdx", handIdx).
+                                        put("x", X).
+                                        put("y", Y).
+                                        put("error",
+                                                "No card available at that position.");
+                                break;
+                            }
                         case "getCardsOnTable":
                             node = output.addObject();
                             node.put("command", "getCardsOnTable");
@@ -424,6 +939,45 @@ public final class Main {
                                     arrayNode1.add(node2);
                                 }
                                 arrayNode.add(arrayNode1);
+                            }
+                            break;
+                        case "getFrozenCardsOnTable":
+                            int verif = 0;
+                            for (ArrayList<CardInput> row : table) {
+                                for (CardInput cardInput : row) {
+                                    if (cardInput.getIsFrozen() == 1) {
+                                        verif = 1;
+                                    }
+                                }
+                            }
+
+                            node = output.addObject();
+                            node.put("command", "getFrozenCardsOnTable");
+                            arrayNode = node.putArray("output");
+                            if (verif == 1) {
+                                for (ArrayList<CardInput> row : table) {
+                                    ArrayNode arrayNode1 = objectMapper.createArrayNode();
+                                    for (CardInput cardInput : row) {
+                                        if (cardInput.getIsFrozen() == 1) {
+                                            ObjectNode node2 = objectMapper.createObjectNode();
+                                            node2.put("mana", cardInput.getMana());
+                                            if (!cardInput.getName().equals("Winterfell")
+                                                    && !cardInput.getName().equals("Heart Hound")
+                                                    && !cardInput.getName().equals("Firestorm")) {
+                                                node2.put("attackDamage", cardInput.getAttackDamage());
+                                                node2.put("health", cardInput.getHealth());
+                                            }
+                                            node2.put("description", cardInput.getDescription());
+                                            ArrayNode colorNode = node2.putArray("colors");
+                                            for (String string : cardInput.getColors()) {
+                                                colorNode.add(string);
+                                            }
+                                            node2.put("name", cardInput.getName());
+                                            arrayNode1.add(node2);
+                                        }
+                                    }
+                                    arrayNode.add(arrayNode1);
+                                }
                             }
                             break;
                         case "getPlayerMana":

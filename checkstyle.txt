@@ -2,6 +2,11 @@ Starting audit...
 [ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/main/Main.java:10:8: Unused import - fileio.ActionsInput. [UnusedImports]
 [ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/main/Main.java:12:8: Unused import - fileio.DecksInput. [UnusedImports]
 [ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/main/Main.java:27:39: Using the '.*' form of import should be avoided - checker.CheckerConstants.*. [AvoidStarImport]
-[ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/main/Main.java:77:5: Method length is 375 lines (max allowed is 150). [MethodLength]
+[ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/main/Main.java:73:5: Method length is 934 lines (max allowed is 150). [MethodLength]
+[ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/main/Main.java:129:25: Name 'X' must match pattern '^[a-z][a-zA-Z0-9]*$'. [LocalVariableName]
+[ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/main/Main.java:131:25: Name 'Y' must match pattern '^[a-z][a-zA-Z0-9]*$'. [LocalVariableName]
+[ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/main/Main.java:772: Line is longer than 100 characters (found 102). [LineLength]
+[ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/main/Main.java:831: Line is longer than 100 characters (found 102). [LineLength]
+[ERROR] /mnt/c/Users/Sebi-PC/Desktop/tema/./src/main/Main.java:967: Line is longer than 100 characters (found 103). [LineLength]
 Audit done.
-Checkstyle ends with 4 errors.
+Checkstyle ends with 9 errors.
