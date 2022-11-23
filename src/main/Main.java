@@ -130,15 +130,7 @@ public final class Main {
                             get(j).getX();
                     int Y = inputData.getGames().get(i).getActions().
                             get(j).getY();
-                    /*int cardAttackerX = inputData.getGames().get(i).getActions().
-                            get(j).getCardAttacker().getX();
-                    int cardAttackerY = inputData.getGames().get(i).getActions().
-                            get(j).getCardAttacker().getY();
-                    int cardAttackedX = inputData.getGames().get(i).getActions().
-                            get(j).getCardAttacked().getX();
-                    int cardAttackedY = inputData.getGames().get(i).getActions().
-                            get(j).getCardAttacked().getY();*/
-
+                    ObjectNode node;
                     switch (inputData.getGames().get(i).getActions().get(j).getCommand()) {
                         case "endPlayerTurn":
                             turnCount++;
@@ -165,18 +157,22 @@ public final class Main {
                                 turn = TWO;
                                 for (int y = 0; y < table.get(TWO).size(); y++) {
                                     table.get(TWO).get(y).setIsFrozen(0);
+                                    table.get(TWO).get(y).setHasAttacked(0);
                                 }
                                 for (int y = 0; y < table.get(THREE).size(); y++) {
                                     table.get(THREE).get(y).setIsFrozen(0);
+                                    table.get(THREE).get(y).setHasAttacked(0);
                                 }
 
                             } else if (turn == TWO) {
                                 turn = ONE;
                                 for (int y = 0; y < table.get(0).size(); y++) {
                                     table.get(0).get(y).setIsFrozen(0);
+                                    table.get(0).get(y).setHasAttacked(0);
                                 }
                                 for (int y = 0; y < table.get(ONE).size(); y++) {
                                     table.get(ONE).get(y).setIsFrozen(0);
+                                    table.get(ONE).get(y).setHasAttacked(0);
                                 }
                             }
                             break;
@@ -191,7 +187,7 @@ public final class Main {
                             } else if (playerIdx == TWO) {
                                 currentDeck = player2.getDeck();
                             }
-                            ObjectNode node = output.addObject();
+                            node = output.addObject();
                             node.put("command", "getPlayerDeck").
                                     put("playerIdx", playerIdx);
                             ArrayNode arrayNode = node.putArray("output");
@@ -753,130 +749,622 @@ public final class Main {
                                 }
                             }
                             break;
-                        /*case "cardUsesAttack":
+                        case "cardUsesAttack":
+                            int cardAttackerX = inputData.getGames().get(i).getActions().
+                                    get(j).getCardAttacker().getX();
+                            int cardAttackerY = inputData.getGames().get(i).getActions().
+                                    get(j).getCardAttacker().getY();
+                            int cardAttackedX = inputData.getGames().get(i).getActions().
+                                    get(j).getCardAttacked().getX();
+                            int cardAttackedY = inputData.getGames().get(i).getActions().
+                                    get(j).getCardAttacked().getY();
                             CardInput cardAttacker = new CardInput();
                             CardInput cardAttacked = new CardInput();
+                            if ((cardAttackedY >= table.get(cardAttackedX).size())
+                                    || (cardAttackerY >= table.get(cardAttackerX).size())) {
+                                break;
+                             }
                             cardAttacker = table.get(cardAttackerX).get(cardAttackerY);
                             cardAttacked = table.get(cardAttackedX).get(cardAttackedY);
                             if (turn == ONE) {
-                                if (cardAttackedX == 0 || cardAttackerX == ONE) {
+                                if (cardAttackedX == 0 || cardAttackedX == ONE) {
                                     if (cardAttacker.getHasAttacked() == 0) {
                                         if (cardAttacker.getIsFrozen() == 0) {
                                             for (int y = 0; y < table.get(ONE).size(); y++) {
                                                 if (table.get(ONE).get(y).getName().
                                                         equals("Goliath")
                                                         || table.get(ONE).get(y).getName().
-                                                        equals("Warden") ) {
-                                                    if (cardAttackedY != y
-                                                            || cardAttackedX != ONE) {
-                                                        //error "Attacked card is not of type 'Tank’."
-                                                        break;
-                                                    } else {
-                                                        player1.setMana(player1.
-                                                                getMana() - cardAttacker.
-                                                                getMana());
-                                                        if (cardAttacked.getHealth() - cardAttacker.
-                                                                getAttackDamage() > 0) {
-                                                            cardAttacked.setHealth(cardAttacked.
-                                                                    getHealth() - cardAttacker.
-                                                                    getAttackDamage());
-                                                        } else {
-                                                            table.get(cardAttackedX).
-                                                                    remove(cardAttacked);
-                                                        }
-                                                        cardAttacker.setHasAttacked(1);
+                                                        equals("Warden")) {
+                                                    if (!cardAttacked.getName().equals("Goliath")
+                                                            && !cardAttacked.getName().
+                                                            equals("Warden")) {
+                                                        node = output.addObject();
+                                                        node.put("command", "cardUsesAttack");
+                                                        ObjectNode node2 = objectMapper.
+                                                                createObjectNode();
+                                                        node.set("cardAttacker", node2);
+                                                        node2.put("x", cardAttackerX).
+                                                                put("y", cardAttackerY);
+                                                        node2 = objectMapper.createObjectNode();
+                                                        node.set("cardAttacked", node2);
+                                                        node2.put("x", cardAttackedX).
+                                                                put("y", cardAttackedY);
+                                                        node.put("error",
+                                                                "Attacked card is not"
+                                                                        + " of type 'Tank'.");
                                                         break;
                                                     }
-                                                } else {
-                                                    player1.setMana(player1.
-                                                            getMana() - cardAttacker.
-                                                            getMana());
-                                                    if (cardAttacked.getHealth() - cardAttacker.
-                                                            getAttackDamage() > 0) {
-                                                        cardAttacked.setHealth(cardAttacked.
-                                                                getHealth() - cardAttacker.
-                                                                getAttackDamage());
-                                                    } else {
-                                                        table.get(cardAttackedX).
-                                                                remove(cardAttacked);
-                                                    }
-                                                    cardAttacker.setHasAttacked(1);
-                                                    break;
                                                 }
                                             }
-                                        } else {
-                                            //error "Attacker card is frozen."
+                                            if (cardAttacked.getHealth() - cardAttacker.
+                                                    getAttackDamage() > 0) {
+                                                cardAttacked.setHealth(cardAttacked.
+                                                        getHealth() - cardAttacker.
+                                                        getAttackDamage());
+                                            } else {
+                                                table.get(cardAttackedX).
+                                                        remove(cardAttacked);
+                                            }
+                                            cardAttacker.setHasAttacked(1);
+                                            break;
+                                    } else {
+                                            node = output.addObject();
+                                            node.put("command", "cardUsesAttack");
+                                            ObjectNode node2 = objectMapper.createObjectNode();
+                                            node.set("cardAttacker", node2);
+                                            node2.put("x", cardAttackerX).
+                                                    put("y", cardAttackerY);
+                                            node2 = objectMapper.createObjectNode();
+                                            node.set("cardAttacked", node2);
+                                            node2.put("x", cardAttackedX).
+                                                    put("y", cardAttackedY);
+                                            node.put("error",
+                                                    "Attacker card is frozen.");
                                             break;
                                         }
                                     } else {
-                                        // error "Attacker card has already attacked this turn."
+                                        node = output.addObject();
+                                        node.put("command", "cardUsesAttack");
+                                        ObjectNode node2 = objectMapper.createObjectNode();
+                                        node.set("cardAttacker", node2);
+                                        node2.put("x", cardAttackerX).
+                                                put("y", cardAttackerY);
+                                        node2 = objectMapper.createObjectNode();
+                                        node.set("cardAttacked", node2);
+                                        node2.put("x", cardAttackedX).
+                                                put("y", cardAttackedY);
+                                        node.put("error",
+                                                "Attacker card has already attacked this turn.");
                                         break;
                                     }
                                 } else {
-                                    //error "Attacked card does not belong to the enemy."
+                                    node = output.addObject();
+                                    node.put("command", "cardUsesAttack");
+                                    ObjectNode node2 = objectMapper.createObjectNode();
+                                    node.set("cardAttacker", node2);
+                                    node2.put("x", cardAttackerX).
+                                            put("y", cardAttackerY);
+                                    node2 = objectMapper.createObjectNode();
+                                    node.set("cardAttacked", node2);
+                                    node2.put("x", cardAttackedX).
+                                            put("y", cardAttackedY);
+                                    node.put("error",
+                                            "Attacked card does not belong to the enemy.");
                                     break;
                                 }
 
                             } else if (turn == TWO) {
-                                if (cardAttackedX == TWO || cardAttackerX == THREE) {
+                                if (cardAttackedX == TWO || cardAttackedX == THREE) {
                                     if (cardAttacker.getHasAttacked() == 0) {
                                         if (cardAttacker.getIsFrozen() == 0) {
                                             for (int y = 0; y < table.get(TWO).size(); y++) {
                                                 if (table.get(TWO).get(y).getName().
                                                         equals("Goliath")
                                                         || table.get(TWO).get(y).getName().
-                                                        equals("Warden") ) {
-                                                    if (cardAttackedY != y
-                                                            || cardAttackedX != TWO) {
-                                                        //error "Attacked card is not of type 'Tank’."
-                                                        break;
-                                                    } else {
-                                                        player2.setMana(player2.
-                                                                getMana() - cardAttacker.
-                                                                getMana());
-                                                        if (cardAttacked.getHealth() - cardAttacker.
-                                                                getAttackDamage() > 0) {
-                                                            cardAttacked.setHealth(cardAttacked.
-                                                                    getHealth() - cardAttacker.
-                                                                    getAttackDamage());
-                                                        } else {
-                                                            table.get(cardAttackedX).
-                                                                    remove(cardAttacked);
-                                                        }
-                                                        cardAttacker.setHasAttacked(1);
+                                                        equals("Warden")) {
+                                                    if (!cardAttacked.getName().equals("Goliath")
+                                                            && !cardAttacked.getName().
+                                                            equals("Warden")) {
+                                                        node = output.addObject();
+                                                        node.put("command", "cardUsesAttack");
+                                                        ObjectNode node2 = objectMapper.
+                                                                createObjectNode();
+                                                        node.set("cardAttacker", node2);
+                                                        node2.put("x", cardAttackerX).
+                                                                put("y", cardAttackerY);
+                                                        node2 = objectMapper.createObjectNode();
+                                                        node.set("cardAttacked", node2);
+                                                        node2.put("x", cardAttackedX).
+                                                                put("y", cardAttackedY);
+                                                        node.put("error",
+                                                                "Attacked card is not"
+                                                                        + " of type 'Tank'.");
                                                         break;
                                                     }
-                                                } else {
-                                                    player2.setMana(player2.
-                                                            getMana() - cardAttacker.
-                                                            getMana());
-                                                    if (cardAttacked.getHealth() - cardAttacker.
-                                                            getAttackDamage() > 0) {
-                                                        cardAttacked.setHealth(cardAttacked.
-                                                                getHealth() - cardAttacker.
-                                                                getAttackDamage());
-                                                    } else {
-                                                        table.get(cardAttackedX).
-                                                                remove(cardAttacked);
-                                                    }
-                                                    cardAttacker.setHasAttacked(1);
-                                                    break;
                                                 }
                                             }
+
+                                            if (cardAttacked.getHealth() - cardAttacker.
+                                                    getAttackDamage() > 0) {
+                                                cardAttacked.setHealth(cardAttacked.
+                                                        getHealth() - cardAttacker.
+                                                        getAttackDamage());
+                                            } else {
+                                                table.get(cardAttackedX).
+                                                        remove(cardAttacked);
+                                            }
+                                            cardAttacker.setHasAttacked(1);
+                                            break;
                                         } else {
-                                            //error "Attacker card is frozen."
+                                            node = output.addObject();
+                                            node.put("command", "cardUsesAttack");
+                                            ObjectNode node2 = objectMapper.createObjectNode();
+                                            node.set("cardAttacker", node2);
+                                            node2.put("x", cardAttackerX).
+                                                    put("y", cardAttackerY);
+                                            node2 = objectMapper.createObjectNode();
+                                            node.set("cardAttacked", node2);
+                                            node2.put("x", cardAttackedX).
+                                                    put("y", cardAttackedY);
+                                            node.put("error",
+                                                    "Attacker card is frozen.");
                                             break;
                                         }
                                     } else {
-                                        // error "Attacker card has already attacked this turn."
+                                        node = output.addObject();
+                                        node.put("command", "cardUsesAttack");
+                                        ObjectNode node2 = objectMapper.createObjectNode();
+                                        node.set("cardAttacker", node2);
+                                        node2.put("x", cardAttackerX).
+                                                put("y", cardAttackerY);
+                                        node2 = objectMapper.createObjectNode();
+                                        node.set("cardAttacked", node2);
+                                        node2.put("x", cardAttackedX).
+                                                put("y", cardAttackedY);
+                                        node.put("error",
+                                                "Attacker card has already attacked this turn.");
                                         break;
                                     }
                                 } else {
-                                    //error "Attacked card does not belong to the enemy."
+                                    node = output.addObject();
+                                    node.put("command", "cardUsesAttack");
+                                    ObjectNode node2 = objectMapper.createObjectNode();
+                                    node.set("cardAttacker", node2);
+                                    node2.put("x", cardAttackerX).
+                                            put("y", cardAttackerY);
+                                    node2 = objectMapper.createObjectNode();
+                                    node.set("cardAttacked", node2);
+                                    node2.put("x", cardAttackedX).
+                                            put("y", cardAttackedY);
+                                    node.put("error",
+                                            "Attacked card does not belong to the enemy.");
                                     break;
                                 }
                             }
-                            break;*/
+                            break;
+                        case "cardUsesAbility":
+                            cardAttackerX = inputData.getGames().get(i).getActions().
+                                    get(j).getCardAttacker().getX();
+                            cardAttackerY = inputData.getGames().get(i).getActions().
+                                    get(j).getCardAttacker().getY();
+                            cardAttackedX = inputData.getGames().get(i).getActions().
+                                    get(j).getCardAttacked().getX();
+                            cardAttackedY = inputData.getGames().get(i).getActions().
+                                    get(j).getCardAttacked().getY();
+                            cardAttacker = new CardInput();
+                            cardAttacked = new CardInput();
+                            if ((cardAttackedY >= table.get(cardAttackedX).size())
+                                    || (cardAttackerY >= table.get(cardAttackerX).size())) {
+                                break;
+                            }
+                            cardAttacker = table.get(cardAttackerX).get(cardAttackerY);
+                            cardAttacked = table.get(cardAttackedX).get(cardAttackedY);
+
+                            if (turn == ONE) {
+                                if (cardAttacker.getIsFrozen() == 0) {
+                                    if (cardAttacker.getHasAttacked() == 0) {
+                                        if (cardAttacker.getName().equals("Disciple")) {
+                                            if (cardAttackedX == TWO || cardAttackedX == THREE) {
+                                                cardAttacked.setHealth(cardAttacked.getHealth() + 2);
+                                                cardAttacker.setHasAttacked(1);
+                                                break;
+                                            } else {
+                                                node = output.addObject();
+                                                node.put("command", "cardUsesAttack");
+                                                ObjectNode node2 = objectMapper.createObjectNode();
+                                                node.set("cardAttacker", node2);
+                                                node2.put("x", cardAttackerX).
+                                                        put("y", cardAttackerY);
+                                                node2 = objectMapper.createObjectNode();
+                                                node.set("cardAttacked", node2);
+                                                node2.put("x", cardAttackedX).
+                                                        put("y", cardAttackedY);
+                                                node.put("error",
+                                                        "Attacked card does not belong to the current player.");
+                                                break;
+                                            }
+                                        }
+                                        if (cardAttacker.getName().equals("The Ripper")) {
+                                            if (cardAttackedX == 0 || cardAttackedX == ONE) {
+                                                for (int y = 0; y < table.get(ONE).size(); y++) {
+                                                    if (table.get(ONE).get(y).getName().
+                                                            equals("Goliath")
+                                                            || table.get(ONE).get(y).getName().
+                                                            equals("Warden")) {
+                                                        if (!cardAttacked.getName().equals("Goliath")
+                                                                && !cardAttacked.getName().
+                                                                equals("Warden")) {
+                                                            node = output.addObject();
+                                                            node.put("command", "cardUsesAttack");
+                                                            ObjectNode node2 = objectMapper.
+                                                                    createObjectNode();
+                                                            node.set("cardAttacker", node2);
+                                                            node2.put("x", cardAttackerX).
+                                                                    put("y", cardAttackerY);
+                                                            node2 = objectMapper.createObjectNode();
+                                                            node.set("cardAttacked", node2);
+                                                            node2.put("x", cardAttackedX).
+                                                                    put("y", cardAttackedY);
+                                                            node.put("error",
+                                                                    "Attacked card is not"
+                                                                            + " of type 'Tank'.");
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                cardAttacked.setAttackDamage(cardAttacked.
+                                                        getAttackDamage() - 2);
+                                                cardAttacker.setHasAttacked(1);
+                                                break;
+                                            } else {
+                                                node = output.addObject();
+                                                node.put("command", "cardUsesAttack");
+                                                ObjectNode node2 = objectMapper.createObjectNode();
+                                                node.set("cardAttacker", node2);
+                                                node2.put("x", cardAttackerX).
+                                                        put("y", cardAttackerY);
+                                                node2 = objectMapper.createObjectNode();
+                                                node.set("cardAttacked", node2);
+                                                node2.put("x", cardAttackedX).
+                                                        put("y", cardAttackedY);
+                                                node.put("error",
+                                                        "Attacked card does not belong to the enemy.");
+                                                break;
+                                            }
+                                        }
+                                        if (cardAttacker.getName().equals("Miraj")) {
+                                            if (cardAttackedX == 0 || cardAttackedX == ONE) {
+                                                for (int y = 0; y < table.get(ONE).size(); y++) {
+                                                    if (table.get(ONE).get(y).getName().
+                                                            equals("Goliath")
+                                                            || table.get(ONE).get(y).getName().
+                                                            equals("Warden")) {
+                                                        if (!cardAttacked.getName().equals("Goliath")
+                                                                && !cardAttacked.getName().
+                                                                equals("Warden")) {
+                                                            node = output.addObject();
+                                                            node.put("command", "cardUsesAttack");
+                                                            ObjectNode node2 = objectMapper.
+                                                                    createObjectNode();
+                                                            node.set("cardAttacker", node2);
+                                                            node2.put("x", cardAttackerX).
+                                                                    put("y", cardAttackerY);
+                                                            node2 = objectMapper.createObjectNode();
+                                                            node.set("cardAttacked", node2);
+                                                            node2.put("x", cardAttackedX).
+                                                                    put("y", cardAttackedY);
+                                                            node.put("error",
+                                                                    "Attacked card is not"
+                                                                            + " of type 'Tank'.");
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                int enemyHealth = cardAttacked.getHealth();
+                                                cardAttacked.setHealth(cardAttacker.getHealth());
+                                                cardAttacker.setHealth(enemyHealth);
+                                                cardAttacker.setHasAttacked(1);
+                                                break;
+                                            } else {
+                                                node = output.addObject();
+                                                node.put("command", "cardUsesAttack");
+                                                ObjectNode node2 = objectMapper.createObjectNode();
+                                                node.set("cardAttacker", node2);
+                                                node2.put("x", cardAttackerX).
+                                                        put("y", cardAttackerY);
+                                                node2 = objectMapper.createObjectNode();
+                                                node.set("cardAttacked", node2);
+                                                node2.put("x", cardAttackedX).
+                                                        put("y", cardAttackedY);
+                                                node.put("error",
+                                                        "Attacked card does not belong to the enemy.");
+                                                break;
+                                            }
+                                        }
+                                        if (cardAttacker.getName().equals("The Cursed One")) {
+                                            if (cardAttackedX == 0 || cardAttackedX == ONE) {
+                                                for (int y = 0; y < table.get(ONE).size(); y++) {
+                                                    if (table.get(ONE).get(y).getName().
+                                                            equals("Goliath")
+                                                            || table.get(ONE).get(y).getName().
+                                                            equals("Warden")) {
+                                                        if (!cardAttacked.getName().equals("Goliath")
+                                                                && !cardAttacked.getName().
+                                                                equals("Warden")) {
+                                                            node = output.addObject();
+                                                            node.put("command", "cardUsesAttack");
+                                                            ObjectNode node2 = objectMapper.
+                                                                    createObjectNode();
+                                                            node.set("cardAttacker", node2);
+                                                            node2.put("x", cardAttackerX).
+                                                                    put("y", cardAttackerY);
+                                                            node2 = objectMapper.createObjectNode();
+                                                            node.set("cardAttacked", node2);
+                                                            node2.put("x", cardAttackedX).
+                                                                    put("y", cardAttackedY);
+                                                            node.put("error",
+                                                                    "Attacked card is not"
+                                                                            + " of type 'Tank'.");
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                int enemyHealth = cardAttacked.getHealth();
+                                                cardAttacked.setHealth(cardAttacked.getAttackDamage());
+                                                cardAttacked.setAttackDamage(enemyHealth);
+                                                cardAttacker.setHasAttacked(1);
+                                                break;
+                                            } else {
+                                                node = output.addObject();
+                                                node.put("command", "cardUsesAttack");
+                                                ObjectNode node2 = objectMapper.createObjectNode();
+                                                node.set("cardAttacker", node2);
+                                                node2.put("x", cardAttackerX).
+                                                        put("y", cardAttackerY);
+                                                node2 = objectMapper.createObjectNode();
+                                                node.set("cardAttacked", node2);
+                                                node2.put("x", cardAttackedX).
+                                                        put("y", cardAttackedY);
+                                                node.put("error",
+                                                        "Attacked card does not belong to the enemy.");
+                                                break;
+                                            }
+                                        }
+
+                                    } else {
+                                        node = output.addObject();
+                                        node.put("command", "cardUsesAttack");
+                                        ObjectNode node2 = objectMapper.createObjectNode();
+                                        node.set("cardAttacker", node2);
+                                        node2.put("x", cardAttackerX).
+                                                put("y", cardAttackerY);
+                                        node2 = objectMapper.createObjectNode();
+                                        node.set("cardAttacked", node2);
+                                        node2.put("x", cardAttackedX).
+                                                put("y", cardAttackedY);
+                                        node.put("error",
+                                                "Attacker card has already attacked this turn.");
+                                        break;
+                                    }
+                                } else {
+                                    node = output.addObject();
+                                    node.put("command", "cardUsesAttack");
+                                    ObjectNode node2 = objectMapper.createObjectNode();
+                                    node.set("cardAttacker", node2);
+                                    node2.put("x", cardAttackerX).
+                                            put("y", cardAttackerY);
+                                    node2 = objectMapper.createObjectNode();
+                                    node.set("cardAttacked", node2);
+                                    node2.put("x", cardAttackedX).
+                                            put("y", cardAttackedY);
+                                    node.put("error",
+                                            "Attacker card is frozen.");
+                                    break;
+                                }
+                            } else if (turn == TWO) {
+                                if (cardAttacker.getIsFrozen() == 0) {
+                                    if (cardAttacker.getHasAttacked() == 0) {
+                                        if (cardAttacker.getName().equals("Disciple")) {
+                                            if (cardAttackedX == 0 || cardAttackedX == ONE) {
+                                                cardAttacked.setHealth(cardAttacked.getHealth() + 2);
+                                                cardAttacker.setHasAttacked(1);
+                                                break;
+                                            } else {
+                                                node = output.addObject();
+                                                node.put("command", "cardUsesAttack");
+                                                ObjectNode node2 = objectMapper.createObjectNode();
+                                                node.set("cardAttacker", node2);
+                                                node2.put("x", cardAttackerX).
+                                                        put("y", cardAttackerY);
+                                                node2 = objectMapper.createObjectNode();
+                                                node.set("cardAttacked", node2);
+                                                node2.put("x", cardAttackedX).
+                                                        put("y", cardAttackedY);
+                                                node.put("error",
+                                                        "Attacked card does not belong to the current player.");
+                                                break;
+                                            }
+                                        }
+                                        if (cardAttacker.getName().equals("The Ripper")) {
+                                            if (cardAttackedX == TWO || cardAttackedX == THREE) {
+                                                for (int y = 0; y < table.get(TWO).size(); y++) {
+                                                    if (table.get(TWO).get(y).getName().
+                                                            equals("Goliath")
+                                                            || table.get(TWO).get(y).getName().
+                                                            equals("Warden")) {
+                                                        if (!cardAttacked.getName().equals("Goliath")
+                                                                && !cardAttacked.getName().
+                                                                equals("Warden")) {
+                                                            node = output.addObject();
+                                                            node.put("command", "cardUsesAttack");
+                                                            ObjectNode node2 = objectMapper.
+                                                                    createObjectNode();
+                                                            node.set("cardAttacker", node2);
+                                                            node2.put("x", cardAttackerX).
+                                                                    put("y", cardAttackerY);
+                                                            node2 = objectMapper.createObjectNode();
+                                                            node.set("cardAttacked", node2);
+                                                            node2.put("x", cardAttackedX).
+                                                                    put("y", cardAttackedY);
+                                                            node.put("error",
+                                                                    "Attacked card is not"
+                                                                            + " of type 'Tank'.");
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                cardAttacked.setAttackDamage(cardAttacked.
+                                                        getAttackDamage() - 2);
+                                                cardAttacker.setHasAttacked(1);
+                                                break;
+                                            } else {
+                                                node = output.addObject();
+                                                node.put("command", "cardUsesAttack");
+                                                ObjectNode node2 = objectMapper.createObjectNode();
+                                                node.set("cardAttacker", node2);
+                                                node2.put("x", cardAttackerX).
+                                                        put("y", cardAttackerY);
+                                                node2 = objectMapper.createObjectNode();
+                                                node.set("cardAttacked", node2);
+                                                node2.put("x", cardAttackedX).
+                                                        put("y", cardAttackedY);
+                                                node.put("error",
+                                                        "Attacked card does not belong to the enemy.");
+                                                break;
+                                            }
+                                        }
+                                        if (cardAttacker.getName().equals("Miraj")) {
+                                            if (cardAttackedX == TWO || cardAttackedX == THREE) {
+                                                for (int y = 0; y < table.get(TWO).size(); y++) {
+                                                    if (table.get(TWO).get(y).getName().
+                                                            equals("Goliath")
+                                                            || table.get(TWO).get(y).getName().
+                                                            equals("Warden")) {
+                                                        if (!cardAttacked.getName().equals("Goliath")
+                                                                && !cardAttacked.getName().
+                                                                equals("Warden")) {
+                                                            node = output.addObject();
+                                                            node.put("command", "cardUsesAttack");
+                                                            ObjectNode node2 = objectMapper.
+                                                                    createObjectNode();
+                                                            node.set("cardAttacker", node2);
+                                                            node2.put("x", cardAttackerX).
+                                                                    put("y", cardAttackerY);
+                                                            node2 = objectMapper.createObjectNode();
+                                                            node.set("cardAttacked", node2);
+                                                            node2.put("x", cardAttackedX).
+                                                                    put("y", cardAttackedY);
+                                                            node.put("error",
+                                                                    "Attacked card is not"
+                                                                            + " of type 'Tank'.");
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                int enemyHealth = cardAttacked.getHealth();
+                                                cardAttacked.setHealth(cardAttacker.getHealth());
+                                                cardAttacker.setHealth(enemyHealth);
+                                                cardAttacker.setHasAttacked(1);
+                                                break;
+                                            } else {
+                                                node = output.addObject();
+                                                node.put("command", "cardUsesAttack");
+                                                ObjectNode node2 = objectMapper.createObjectNode();
+                                                node.set("cardAttacker", node2);
+                                                node2.put("x", cardAttackerX).
+                                                        put("y", cardAttackerY);
+                                                node2 = objectMapper.createObjectNode();
+                                                node.set("cardAttacked", node2);
+                                                node2.put("x", cardAttackedX).
+                                                        put("y", cardAttackedY);
+                                                node.put("error",
+                                                        "Attacked card does not belong to the enemy.");
+                                                break;
+                                            }
+                                        }
+                                        if (cardAttacker.getName().equals("The Cursed One")) {
+                                            if (cardAttackedX == TWO || cardAttackedX == THREE) {
+                                                for (int y = 0; y < table.get(TWO).size(); y++) {
+                                                    if (table.get(TWO).get(y).getName().
+                                                            equals("Goliath")
+                                                            || table.get(TWO).get(y).getName().
+                                                            equals("Warden")) {
+                                                        if (!cardAttacked.getName().equals("Goliath")
+                                                                && !cardAttacked.getName().
+                                                                equals("Warden")) {
+                                                            node = output.addObject();
+                                                            node.put("command", "cardUsesAttack");
+                                                            ObjectNode node2 = objectMapper.
+                                                                    createObjectNode();
+                                                            node.set("cardAttacker", node2);
+                                                            node2.put("x", cardAttackerX).
+                                                                    put("y", cardAttackerY);
+                                                            node2 = objectMapper.createObjectNode();
+                                                            node.set("cardAttacked", node2);
+                                                            node2.put("x", cardAttackedX).
+                                                                    put("y", cardAttackedY);
+                                                            node.put("error",
+                                                                    "Attacked card is not"
+                                                                            + " of type 'Tank'.");
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                int enemyHealth = cardAttacked.getHealth();
+                                                cardAttacked.setHealth(cardAttacked.getAttackDamage());
+                                                cardAttacked.setAttackDamage(enemyHealth);
+                                                cardAttacker.setHasAttacked(1);
+                                                break;
+                                            } else {
+                                                node = output.addObject();
+                                                node.put("command", "cardUsesAttack");
+                                                ObjectNode node2 = objectMapper.createObjectNode();
+                                                node.set("cardAttacker", node2);
+                                                node2.put("x", cardAttackerX).
+                                                        put("y", cardAttackerY);
+                                                node2 = objectMapper.createObjectNode();
+                                                node.set("cardAttacked", node2);
+                                                node2.put("x", cardAttackedX).
+                                                        put("y", cardAttackedY);
+                                                node.put("error",
+                                                        "Attacked card does not belong to the enemy.");
+                                                break;
+                                            }
+                                        }
+
+
+                                    } else {
+                                        node = output.addObject();
+                                        node.put("command", "cardUsesAttack");
+                                        ObjectNode node2 = objectMapper.createObjectNode();
+                                        node.set("cardAttacker", node2);
+                                        node2.put("x", cardAttackerX).
+                                                put("y", cardAttackerY);
+                                        node2 = objectMapper.createObjectNode();
+                                        node.set("cardAttacked", node2);
+                                        node2.put("x", cardAttackedX).
+                                                put("y", cardAttackedY);
+                                        node.put("error",
+                                                "Attacker card has already attacked this turn.");
+                                        break;
+                                    }
+                                } else {
+                                    node = output.addObject();
+                                    node.put("command", "cardUsesAttack");
+                                    ObjectNode node2 = objectMapper.createObjectNode();
+                                    node.set("cardAttacker", node2);
+                                    node2.put("x", cardAttackerX).
+                                            put("y", cardAttackerY);
+                                    node2 = objectMapper.createObjectNode();
+                                    node.set("cardAttacked", node2);
+                                    node2.put("x", cardAttackedX).
+                                            put("y", cardAttackedY);
+                                    node.put("error",
+                                            "Attacker card is frozen.");
+                                    break;
+                                }
+                            }
+                            break;
                         case "getCardAtPosition":
                             if (table.size() > X) {
                                 if (table.get(X).size() > Y) {
@@ -899,19 +1387,17 @@ public final class Main {
                                     break;
                                 } else {
                                     output.addObject().put("command", "getCardAtPosition").
-                                            put("handIdx", handIdx).
                                             put("x", X).
                                             put("y", Y).
-                                            put("error",
+                                            put("output",
                                                     "No card available at that position.");
                                     break;
                                 }
                             } else {
                                 output.addObject().put("command", "getCardAtPosition").
-                                        put("handIdx", handIdx).
                                         put("x", X).
                                         put("y", Y).
-                                        put("error",
+                                        put("output",
                                                 "No card available at that position.");
                                 break;
                             }
@@ -964,7 +1450,8 @@ public final class Main {
                                             if (!cardInput.getName().equals("Winterfell")
                                                     && !cardInput.getName().equals("Heart Hound")
                                                     && !cardInput.getName().equals("Firestorm")) {
-                                                node2.put("attackDamage", cardInput.getAttackDamage());
+                                                node2.put("attackDamage", cardInput.
+                                                        getAttackDamage());
                                                 node2.put("health", cardInput.getHealth());
                                             }
                                             node2.put("description", cardInput.getDescription());

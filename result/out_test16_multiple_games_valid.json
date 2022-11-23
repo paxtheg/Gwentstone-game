@@ -97,7 +97,7 @@
   } ], [ {
     "mana" : 2,
     "attackDamage" : 5,
-    "health" : 3,
+    "health" : 4,
     "description" : "Standard card: When he is near, close your eyes. They betray your mind.",
     "colors" : [ "Yellow", "Orange", "Red" ],
     "name" : "Miraj"
@@ -118,7 +118,7 @@
   }, {
     "mana" : 1,
     "attackDamage" : 6,
-    "health" : 4,
+    "health" : 3,
     "description" : "Premium card: Insanity is always an option, now it is an absolute.",
     "colors" : [ "Yellow", "Orange", "Red" ],
     "name" : "Miraj"
@@ -207,10 +207,9 @@
   "output" : [ ]
 }, {
   "command" : "getCardAtPosition",
-  "handIdx" : 0,
   "x" : 0,
   "y" : 0,
-  "error" : "No card available at that position."
+  "output" : "No card available at that position."
 }, {
   "command" : "getFrozenCardsOnTable",
   "output" : [ ]

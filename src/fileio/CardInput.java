@@ -10,9 +10,9 @@ public final class CardInput {
     private ArrayList<String> colors;
     private String name;
 
-    private int isFrozen;
+    private int isFrozen = 0;
 
-    private int hasAttacked;
+    private int hasAttacked = 0;
 
 
     public CardInput() {

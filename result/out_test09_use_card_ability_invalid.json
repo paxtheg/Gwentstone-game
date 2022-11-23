@@ -23,6 +23,61 @@
     "name" : "The Ripper"
   }
 }, {
+  "command" : "cardUsesAttack",
+  "cardAttacker" : {
+    "x" : 2,
+    "y" : 0
+  },
+  "cardAttacked" : {
+    "x" : 0,
+    "y" : 0
+  },
+  "error" : "Attacker card is frozen."
+}, {
+  "command" : "cardUsesAttack",
+  "cardAttacker" : {
+    "x" : 2,
+    "y" : 0
+  },
+  "cardAttacked" : {
+    "x" : 0,
+    "y" : 0
+  },
+  "error" : "Attacked card is not of type 'Tank'."
+}, {
+  "command" : "cardUsesAttack",
+  "cardAttacker" : {
+    "x" : 3,
+    "y" : 0
+  },
+  "cardAttacked" : {
+    "x" : 1,
+    "y" : 0
+  },
+  "error" : "Attacker card has already attacked this turn."
+}, {
+  "command" : "cardUsesAttack",
+  "cardAttacker" : {
+    "x" : 2,
+    "y" : 0
+  },
+  "cardAttacked" : {
+    "x" : 2,
+    "y" : 1
+  },
+  "error" : "Attacker card has already attacked this turn."
+}, {
+  "command" : "cardUsesAttack",
+  "cardAttacker" : {
+    "x" : 2,
+    "y" : 0
+  },
+  "cardAttacked" : {
+    "x" : 1,
+    "y" : 0
+  },
+  "error" : "Attacker card has already attacked this turn."
+}, {
   "command" : "getCardsInHand",
   "playerIdx" : 2,
   "output" : [ {
@@ -41,6 +96,17 @@
   "command" : "getPlayerTurn",
   "output" : 2
 }, {
+  "command" : "cardUsesAttack",
+  "cardAttacker" : {
+    "x" : 0,
+    "y" : 0
+  },
+  "cardAttacked" : {
+    "x" : 2,
+    "y" : 1
+  },
+  "error" : "Attacked card does not belong to the current player."
+}, {
   "command" : "getPlayerMana",
   "playerIdx" : 1,
   "output" : 14
@@ -52,15 +118,15 @@
   "command" : "getCardsOnTable",
   "output" : [ [ {
     "mana" : 2,
-    "attackDamage" : 0,
+    "attackDamage" : -2,
     "health" : 2,
     "description" : "Premium card: The will of Gods has been spoken, obey and you shall be saved...or not.",
     "colors" : [ "Green", "Yellow", "Blue" ],
     "name" : "Disciple"
   } ], [ {
     "mana" : 3,
-    "attackDamage" : 1,
-    "health" : 8,
+    "attackDamage" : 10,
+    "health" : 1,
     "description" : "Standard card: A warrior who is never afraid of battle, no matter the costs",
     "colors" : [ "Red", "Purple" ],
     "name" : "Goliath"
