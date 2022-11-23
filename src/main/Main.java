@@ -965,7 +965,8 @@ public final class Main {
                                     if (cardAttacker.getHasAttacked() == 0) {
                                         if (cardAttacker.getName().equals("Disciple")) {
                                             if (cardAttackedX == TWO || cardAttackedX == THREE) {
-                                                cardAttacked.setHealth(cardAttacked.getHealth() + 2);
+                                                cardAttacked.setHealth(cardAttacked.
+                                                        getHealth() + 2);
                                                 cardAttacker.setHasAttacked(1);
                                                 break;
                                             } else {
@@ -980,7 +981,8 @@ public final class Main {
                                                 node2.put("x", cardAttackedX).
                                                         put("y", cardAttackedY);
                                                 node.put("error",
-                                                        "Attacked card does not belong to the current player.");
+                                                        "Attacked card does not belong"
+                                                                + " to the current player.");
                                                 break;
                                             }
                                         }
@@ -991,7 +993,8 @@ public final class Main {
                                                             equals("Goliath")
                                                             || table.get(ONE).get(y).getName().
                                                             equals("Warden")) {
-                                                        if (!cardAttacked.getName().equals("Goliath")
+                                                        if (!cardAttacked.getName().
+                                                                equals("Goliath")
                                                                 && !cardAttacked.getName().
                                                                 equals("Warden")) {
                                                             node = output.addObject();
@@ -1028,7 +1031,8 @@ public final class Main {
                                                 node2.put("x", cardAttackedX).
                                                         put("y", cardAttackedY);
                                                 node.put("error",
-                                                        "Attacked card does not belong to the enemy.");
+                                                        "Attacked card does not "
+                                                                + "belong to the enemy.");
                                                 break;
                                             }
                                         }
@@ -1039,7 +1043,8 @@ public final class Main {
                                                             equals("Goliath")
                                                             || table.get(ONE).get(y).getName().
                                                             equals("Warden")) {
-                                                        if (!cardAttacked.getName().equals("Goliath")
+                                                        if (!cardAttacked.getName().
+                                                                equals("Goliath")
                                                                 && !cardAttacked.getName().
                                                                 equals("Warden")) {
                                                             node = output.addObject();
@@ -1077,7 +1082,8 @@ public final class Main {
                                                 node2.put("x", cardAttackedX).
                                                         put("y", cardAttackedY);
                                                 node.put("error",
-                                                        "Attacked card does not belong to the enemy.");
+                                                        "Attacked card does not "
+                                                                + "belong to the enemy.");
                                                 break;
                                             }
                                         }
@@ -1088,7 +1094,8 @@ public final class Main {
                                                             equals("Goliath")
                                                             || table.get(ONE).get(y).getName().
                                                             equals("Warden")) {
-                                                        if (!cardAttacked.getName().equals("Goliath")
+                                                        if (!cardAttacked.getName().
+                                                                equals("Goliath")
                                                                 && !cardAttacked.getName().
                                                                 equals("Warden")) {
                                                             node = output.addObject();
@@ -1110,7 +1117,8 @@ public final class Main {
                                                     }
                                                 }
                                                 int enemyHealth = cardAttacked.getHealth();
-                                                cardAttacked.setHealth(cardAttacked.getAttackDamage());
+                                                cardAttacked.setHealth(cardAttacked.
+                                                        getAttackDamage());
                                                 cardAttacked.setAttackDamage(enemyHealth);
                                                 cardAttacker.setHasAttacked(1);
                                                 break;
@@ -1126,7 +1134,8 @@ public final class Main {
                                                 node2.put("x", cardAttackedX).
                                                         put("y", cardAttackedY);
                                                 node.put("error",
-                                                        "Attacked card does not belong to the enemy.");
+                                                        "Attacked card does not "
+                                                                + "belong to the enemy.");
                                                 break;
                                             }
                                         }
@@ -1165,8 +1174,10 @@ public final class Main {
                                 if (cardAttacker.getIsFrozen() == 0) {
                                     if (cardAttacker.getHasAttacked() == 0) {
                                         if (cardAttacker.getName().equals("Disciple")) {
-                                            if (cardAttackedX == 0 || cardAttackedX == ONE) {
-                                                cardAttacked.setHealth(cardAttacked.getHealth() + 2);
+                                            if (cardAttackedX == 0
+                                                    || cardAttackedX == ONE) {
+                                                cardAttacked.setHealth(cardAttacked.
+                                                        getHealth() + 2);
                                                 cardAttacker.setHasAttacked(1);
                                                 break;
                                             } else {
@@ -1181,7 +1192,8 @@ public final class Main {
                                                 node2.put("x", cardAttackedX).
                                                         put("y", cardAttackedY);
                                                 node.put("error",
-                                                        "Attacked card does not belong to the current player.");
+                                                        "Attacked card does not "
+                                                                + "belong to the current player.");
                                                 break;
                                             }
                                         }
@@ -1192,7 +1204,8 @@ public final class Main {
                                                             equals("Goliath")
                                                             || table.get(TWO).get(y).getName().
                                                             equals("Warden")) {
-                                                        if (!cardAttacked.getName().equals("Goliath")
+                                                        if (!cardAttacked.getName().
+                                                                equals("Goliath")
                                                                 && !cardAttacked.getName().
                                                                 equals("Warden")) {
                                                             node = output.addObject();
@@ -1229,7 +1242,8 @@ public final class Main {
                                                 node2.put("x", cardAttackedX).
                                                         put("y", cardAttackedY);
                                                 node.put("error",
-                                                        "Attacked card does not belong to the enemy.");
+                                                        "Attacked card does not "
+                                                                + "belong to the enemy.");
                                                 break;
                                             }
                                         }
@@ -1240,7 +1254,8 @@ public final class Main {
                                                             equals("Goliath")
                                                             || table.get(TWO).get(y).getName().
                                                             equals("Warden")) {
-                                                        if (!cardAttacked.getName().equals("Goliath")
+                                                        if (!cardAttacked.getName().
+                                                                equals("Goliath")
                                                                 && !cardAttacked.getName().
                                                                 equals("Warden")) {
                                                             node = output.addObject();
@@ -1278,7 +1293,8 @@ public final class Main {
                                                 node2.put("x", cardAttackedX).
                                                         put("y", cardAttackedY);
                                                 node.put("error",
-                                                        "Attacked card does not belong to the enemy.");
+                                                        "Attacked card does not"
+                                                                + " belong to the enemy.");
                                                 break;
                                             }
                                         }
@@ -1289,7 +1305,8 @@ public final class Main {
                                                             equals("Goliath")
                                                             || table.get(TWO).get(y).getName().
                                                             equals("Warden")) {
-                                                        if (!cardAttacked.getName().equals("Goliath")
+                                                        if (!cardAttacked.getName().
+                                                                equals("Goliath")
                                                                 && !cardAttacked.getName().
                                                                 equals("Warden")) {
                                                             node = output.addObject();
@@ -1311,7 +1328,8 @@ public final class Main {
                                                     }
                                                 }
                                                 int enemyHealth = cardAttacked.getHealth();
-                                                cardAttacked.setHealth(cardAttacked.getAttackDamage());
+                                                cardAttacked.setHealth(cardAttacked.
+                                                        getAttackDamage());
                                                 cardAttacked.setAttackDamage(enemyHealth);
                                                 cardAttacker.setHasAttacked(1);
                                                 break;
@@ -1327,7 +1345,8 @@ public final class Main {
                                                 node2.put("x", cardAttackedX).
                                                         put("y", cardAttackedY);
                                                 node.put("error",
-                                                        "Attacked card does not belong to the enemy.");
+                                                        "Attacked card does not "
+                                                                + "belong to the enemy.");
                                                 break;
                                             }
                                         }
